@@ -51,7 +51,8 @@ def enroll(name,file):
     print("Loading model weights from [{}]....".format(p.MODEL_FILE))
     try:
         model = load_model(p.MODEL_FILE)
-    except:
+    except Exception  as e:
+        print(e)
         print("Failed to load weights from the weights file, please ensure *.pb file is present in the MODEL_FILE directory")
         exit()
     
@@ -126,14 +127,16 @@ def recognize(file):
         distances.update({speaker:distance})
     if min(list(distances.values()))<p.THRESHOLD:
         print("Recognized: ",min(distances, key=distances.get))
-        if min(distances, key=distances.get) == 'searcher':
-            return True
+        '''if min(distances, key=distances.get) == 'searcher':
+            return True'''
+        speaker = min(distances, key=distances.get)
+        return [True, speaker]
     else:
         print("Could not identify the user, try enrolling again with a clear voice sample")
         print("Score: ",min(list(distances.values())))
-        return False
+        return [False, '']#False, ]
         #exit()
-    return False
+    return [False, '']
 #Helper functions
 def file_choices(choices,filename):
     ext = os.path.splitext(filename)[1][1:]
@@ -173,12 +176,13 @@ def enrollSearcher():
     enroll(name, file)
 def recognizeSearcher(file):
     recognize(file)
+    #return recognize(file) == recognize('request.wav')# and
 def delete(filename):
     if filename != '':
         if os.path.exists(filename):
             os.remove(filename)
 def deleteUserBiometry():
-    if os.path.exists('data\\embedded\\searcher.np'):
-        delete('data\\embedde\\searcher.np')
+    if os.path.exists('data\\embed\\searcher.np'):
+        delete('data\\embed\\searcher.np')
 
 

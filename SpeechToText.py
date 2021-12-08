@@ -6,4 +6,12 @@ def recognize_speech(path, language):
     audio = speech_recognition.AudioFile(path)
     with audio as audio_for_recording:
         recorded_audio = recognizer.record(audio_for_recording)
-    return recognizer.recognize_google(recorded_audio, language = language)
+    #екнЖi
+        #try:
+            #''
+        try:
+            return recognizer.recognize_google(recorded_audio, language = language)
+        #'except:'
+            #'return ''#False#pass'
+        except: #[]
+            return False
