@@ -14,4 +14,4 @@ def recognize_speech(path, language):
         #'except:'
             #'return ''#False#pass'
         except: #[]
-            return False
+            return ''#False

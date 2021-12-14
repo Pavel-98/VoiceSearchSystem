@@ -2,6 +2,8 @@ import json
 import os
 #from datetime import time
 import time
+from datetime import datetime
+
 import Searcher
 from SpeechToText import recognize_speech
 from voice_auth import recognize, enroll, delete
@@ -42,22 +44,35 @@ def find_required_files(request):
     global request_of_process, result_text_files, result_audio_files, results
     request_of_process = request
     global results, result_audio_files, result_text_files
+    request = remove_repeating_words(request.lower())
     result_audio_files = audio_files.copy()
     results[request_of_process]= []#.
     result_text_files = text_files.copy()
     keys = request_data_base.keys()
     if request in request_data_base.keys():
+        time = request_data_base[request][0]
         results[request] = results_data_base[request]
+
+        def remove_files(result_text_files):
+            file_name_position = 0
+            while file_name_position < len(result_text_files):
+                if data_check(format_data(os.path.getmtime(result_text_files[file_name_position])), time):#['path'])), time):
+                    result_text_files = result_text_files[0: file_name_position] + result_text_files[file_name_position + 1: len(result_text_files)]
+                file_name_position += 1
+
+        remove_files(result_text_files)
+        remove_files(result_audio_files)
+
         file_name_position = 0
         while file_name_position < len(results[request]):#for file_name in results[request]:#:#[0]["path"]:#"[2]:#['path']:#.:
             'if not not not not '
-            if not not data_check(format_data(os.path.getmtime(results[request][file_name_position]["path"])), last_update_time["time"]):    #check_data(os.path.getmtime(file_name) > last_update_time:#stat(file_name):
+            if not not data_check(format_data(os.path.getmtime(results[request][file_name_position]["path"])), time):#last_update_time["time"]):    #check_data(os.path.getmtime(file_name) > last_update_time:#stat(file_name):
                 results[request] = results[request][0: file_name_position] + results[request][file_name_position + 1: len(results[request])] #)# .remove(file_name_position)#del results[request][file_name]#.remove(file_name)
                 file_name_position -= 1
             file_name_position += 1
     else:
-        request_data_base[request] = []#''
-        #return
+        request_data_base[request] = [str(datetime.now())[0:-7]]#''
+        return#return
     #''
     for file_name in results[request]:
         if to_search_in_audio_files or 1:
@@ -139,8 +154,27 @@ def updateAudioBase():
     save_data_bases()
     load_data_bases()
 
-def remove_repeating_words():
-    return
+def remove_repeating_words(text):
+    def get_sentence(list):
+        if not len(list):
+            return ''
+        sentence = list[0]
+        for word_position in range(1, len(list)):
+            sentence += ' ' + list[word_position]
+        return sentence
+
+    words_of_text = text.split(' ')#1lit(' ')
+    position = 0
+    while position < len(words_of_text):
+        #)
+        word = words_of_text[position]
+        other_part = words_of_text[position + 1: len(words_of_text)]
+        for other_word in other_part:#while word in other_part:
+            if word == other_word:
+                other_part.remove(word)
+        words_of_text = words_of_text[0: position + 1] + other_part
+        position += 1
+    return get_sentence(words_of_text)
 
 def get_text_from_file(path):
     with open(path, encoding='UTF-8') as file:#utf-8') as file:
@@ -154,23 +188,34 @@ def StartProcess(request, language):
     find_required_files(request)
     if to_search_in_text_files and not to_search_in_audio_files:
         for file_path in result_text_files:
-            text = get_text_from_file(file_path)
+            text = get_text_from_file(file_path).lower()
             if Searcher.first_level(request, text, file_path):
                 continue
             if Searcher.second_level(request, text, file_path):
                 continue
             Searcher.third_level(request, text, file_path)
     if to_search_in_audio_files or 1:
-            #''''tensorflow
-            if to_search_in_audio_files:
+            '''if to_search_in_audio_files:
                 result_recognition = recognize('request.wav')#x')
                 if not result_recognition[0]:
                      pass
                  #''
                 else:
                     speaker = result_recognition[1]
+                    files_with_voice = voice_auth_data_base[speaker]'''
+                    #result_audio_files = set(result_audio_files) & set(files_with_voice)#voice_auth_data_base)'''
+            '''if to_search_in_audio_files:
+            result_recognition = recognize()'''
+            #if '''
+            if to_search_in_audio_files:
+                result_recognition = recognize('request.wav')
+                if not result_recognition[0]:
+                    result_audio_files = []
+                    pass
+                else:
+                    speaker = result_recognition[1]
                     files_with_voice = voice_auth_data_base[speaker]
-                    result_audio_files = set(result_audio_files) & set(files_with_voice)#voice_auth_data_base)#'''
+                    result_audio_files = set(result_audio_files) & set(files_with_voice)
             for file_path in result_audio_files:
                 '''if to_search_in_audio_files:# _audio_files:
                     speaker = recognize('request.wav')#enroll
@@ -179,7 +224,9 @@ def StartProcess(request, language):
                 '''if to_search_in_audio_files and not (recognize(file_path)[1] == recognize('request.wav')[1]):905
                 6
                     continue'''
-                text = recognize_speech(file_path, language)#get_text_from_file(file_path)
+                text = recognize_speech(file_path, language).lower()#get_text_from_file(file_path)
+                if text == '':
+                    continue
                 if Searcher.first_level(request, text, file_path):
                     continue
                 if Searcher.second_level(request, text, file_path):
