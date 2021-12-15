@@ -141,8 +141,17 @@ def data_check(probably_older_data, other_data):
     return False
 
 def updateAudioBase():
+    def contains(list, item):
+        for element in list:
+            if element == item:
+                return True
+        return False
+    def deleteADB():
+        for item in voice_auth_data_base.keys():
+            voice_auth_data_base[item] = []
     #audio_files = find_audio_files()
     find_audio_files()
+    deleteADB()
     for audio_file in audio_files:
         result_of_recognition = recognize(audio_file)
         if not result_of_recognition[0]: #recognize(audio_file):
@@ -150,6 +159,9 @@ def updateAudioBase():
             voice_auth_data_base[audio_file] = []
             voice_auth_data_base[audio_file].append(audio_file)
         else:
+            if contains(voice_auth_data_base[result_of_recognition[1]], audio_file):
+                continue
+            #]
             voice_auth_data_base[result_of_recognition[1]].append(audio_file)
     save_data_bases()
     load_data_bases()
@@ -208,7 +220,7 @@ def StartProcess(request, language):
             result_recognition = recognize()'''
             #if '''
             if to_search_in_audio_files:
-                result_recognition = recognize('request.wav')
+                result_recognition = recognize('request.wav')#[True, 'audio_file1.wav']#recognize('request.wav')
                 if not result_recognition[0]:
                     result_audio_files = []
                     pass

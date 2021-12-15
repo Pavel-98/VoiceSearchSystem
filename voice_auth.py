@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from scipy.spatial.distance import cdist, euclidean, cosine 
 import warnings
-from keras.models import load_model
+#from keras.models import load_model
 import logging
 
 import Recorder
@@ -20,7 +20,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # FATAL
 logging.getLogger('tensorflow').setLevel(logging.FATAL)
 #IMPORT USER-DEFINED FUNCTIONS
-from feature_extraction import get_embedding, get_embeddings_from_list_file
+#from feature_extraction import get_embedding, get_embeddings_from_list_file
 from preprocess import get_fft_spectrum
 import parameters as p
 
@@ -141,7 +141,8 @@ def recognize(file):
 def file_choices(choices,filename):
     ext = os.path.splitext(filename)[1][1:]
     if ext not in choices:
-        parser.error("file doesn't end with one of {}".format(choices))
+        exit()
+        #parser.error("file doesn't end with one of {}".format(choices))
     return filename
 
 def get_extension(filename):
